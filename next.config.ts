@@ -1,7 +1,15 @@
-import type { NextConfig } from "next";
+import { NextConfig } from 'next';
 
-const nextConfig: NextConfig = {
-  /* config options here */
+const config: NextConfig = {
+  reactStrictMode: true,
+  async rewrites() {
+    return [
+      {
+        source: '/socket.io/:path*',
+        destination: 'http://localhost:3000/socket.io/:path*',
+      },
+    ];
+  },
 };
 
-export default nextConfig;
+export default config;
