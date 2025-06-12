@@ -5,7 +5,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import Chat from '@/components/Chat';
 
-export default function Home() {
+export default function ChatSection() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
 
