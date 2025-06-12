@@ -1,16 +1,15 @@
 import { Client, Account, Databases } from 'appwrite';
 
-export const client = new Client();
+const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1';
+const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
 
-client
-    .setEndpoint('https://cloud.appwrite.io/v1')
-    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!); // Replace with your project ID
+if (!endpoint || !projectId) {
+  throw new Error('Missing required environment variables for Appwrite configuration');
+}
+
+const client = new Client();
+client.setEndpoint(endpoint);
+client.setProject(projectId);
 
 export const account = new Account(client);
 export const databases = new Databases(client);
-
-export const appwriteConfig = {
-    projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!,
-    databaseId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-    usersCollectionId: 'users',
-};
