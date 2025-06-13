@@ -11,7 +11,7 @@ import Link from 'next/link';
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
-});a
+});
 
 type LoginForm = z.infer<typeof loginSchema>;
 
