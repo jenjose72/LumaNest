@@ -42,8 +42,8 @@ export default function MeditationPage() {
       {/* Padding to prevent content being hidden under navbar */}
       <div className="pt-20 w-full flex flex-col items-center py-12 px-4">
         <MeditationTimer onSessionSaved={() => setRefreshKey((k) => k + 1)} />
-        <MeditationHistory key={refreshKey} />
-        <MeditationHistoryGraph />
+        <MeditationHistory key={`history-${refreshKey}`} />
+        <MeditationHistoryGraph key={`graph-${refreshKey}`} />
       </div>
     </div>
   );
