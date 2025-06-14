@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import Navbar from '@/components/Navbar';
-import MoodForm from '@/components/MoodForm';
-import MoodChart from '@/components/MoodChart';
+import MeditationTimer from '@/components/MeditationTimer';
+import MeditationHistory from '@/components/MeditationHistory';
+import MeditationHistoryGraph from '@/components/MeditationHistoryGraph';
 import { useScrollDirection } from '@/components/hooks/useScrollDirection';
 
-export default function MoodTrackerPage() {
+export default function MeditationPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [showForm, setShowForm] = useState(true);
-  const [chartKey, setChartKey] = useState(0); // for reloading chart
+  const [refreshKey, setRefreshKey] = useState(0);
   const scrollDirection = useScrollDirection();
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function MoodTrackerPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center bg-gray-50">
       {/* Navbar with hide/show on scroll */}
       <div
         className={`fixed top-0 left-0 w-full z-50 transition-transform duration-300 ${
@@ -39,17 +39,11 @@ export default function MoodTrackerPage() {
       >
         <Navbar />
       </div>
-      {/* Add padding to prevent content being hidden under navbar */}
-      <div className="pt-20 w-full flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        {showForm && (
-          <MoodForm
-            onSubmitted={() => {
-              setShowForm(false);
-              setChartKey((k) => k + 1); // force MoodChart to reload
-            }}
-          />
-        )}
-        <MoodChart key={chartKey} />
+      {/* Padding to prevent content being hidden under navbar */}
+      <div className="pt-20 w-full flex flex-col items-center py-12 px-4">
+        <MeditationTimer onSessionSaved={() => setRefreshKey((k) => k + 1)} />
+        <MeditationHistory key={refreshKey} />
+        <MeditationHistoryGraph />
       </div>
     </div>
   );
