@@ -1,110 +1,152 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useAuth } from '@/context/auth-context';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { Client, Account, ID } from "appwrite";
 
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
+// Initialize Appwrite Client
+const client = new Client();
+client
+  .setEndpoint('https://cloud.appwrite.io/v1')
+  .setProject('684aa8f1001ab90bbfd9');
 
-type LoginForm = z.infer<typeof loginSchema>;
+const account = new Account(client);
 
-export default function Login() {
-  const { signIn } = useAuth();
+export default function LoginPage() {
   const router = useRouter();
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [isChecking, setIsChecking] = useState(true);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
-  });
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        // Check if there's an active session
+        const session = await account.get();
+        // If session exists, user is logged in, redirect to home
+        if(session)
+          router.push('/home');
+      } catch (error) {
+        // No session, user needs to log in
+        setIsChecking(false);
+      }
+    };
 
-  async function onSubmit(data: LoginForm) {
+    checkSession();
+  }, [router]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
     try {
-      await signIn(data.email, data.password);
+      await account.createEmailSession(email, password);
       router.push('/home');
-    } catch (error: any) {
-      setError('Invalid email or password');
+    } catch (error) {
+      console.error("Login error:", error);
+      setError(
+        error.message || 
+        "Failed to login. Please check your credentials and try again."
+      );
+      setIsLoading(false);
     }
+  };
+
+  // Show loading state while checking session
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-100 to-white">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-100 to-white px-4">
+      <div className="max-w-md w-full p-8 bg-white rounded-xl shadow-lg">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Welcome Back</h1>
+          <p className="text-gray-600 mt-2">Sign in to continue to your account</p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                {...register('email')}
-                type="email"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-              />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
+
+        {error && (
+          <div className="mb-6 p-3 bg-red-100 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin}>
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email">
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="mb-6">
+            <div className="flex justify-between mb-2">
+              <label className="text-gray-700 text-sm font-semibold" htmlFor="password">
                 Password
               </label>
-              <input
-                {...register('password')}
-                type="password"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-              />
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
+              <Link href="/auth/forgot-password" className="text-sm text-indigo-600 hover:underline">
+                Forgot Password?
+              </Link>
             </div>
+            <input
+              id="password"
+              type="password"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
           </div>
 
-          {error && (
-            <div className="text-red-500 text-sm text-center">{error}</div>
-          )}
-
-          <div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              {isSubmitting ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
-
-          <div className="text-sm text-center">
-            Don't have an account?{' '}
-            <Link
-              href="/signup"
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              Sign up
-            </Link>
-          </div>
+          <button
+            type="submit"
+            className={`w-full py-3 rounded-lg bg-indigo-600 text-white font-semibold
+              ${isLoading ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"}`}
+            disabled={isLoading}
+          >
+            {isLoading ? "Signing in..." : "Sign In"}
+          </button>
         </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            Don&apos;t have an account?{" "}
+            <Link href="/auth/register" className="text-indigo-600 font-semibold hover:underline">
+              Create Account
+            </Link>
+          </p>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <p className="text-center text-sm text-gray-600">
+            By signing in, you agree to our{" "}
+            <Link href="/terms" className="text-indigo-600 hover:underline">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="text-indigo-600 hover:underline">
+              Privacy Policy
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
