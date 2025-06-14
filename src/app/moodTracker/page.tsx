@@ -12,7 +12,7 @@ export default function MoodTrackerPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [showForm, setShowForm] = useState(true);
-  const [chartKey, setChartKey] = useState(0); // for reloading chart
+  const [refreshKey, setRefreshKey] = useState(0);
   const scrollDirection = useScrollDirection();
 
   useEffect(() => {
@@ -45,11 +45,11 @@ export default function MoodTrackerPage() {
           <MoodForm
             onSubmitted={() => {
               setShowForm(false);
-              setChartKey((k) => k + 1); // force MoodChart to reload
+              setRefreshKey((k) => k + 1); // force MoodChart to reload
             }}
           />
         )}
-        <MoodChart key={chartKey} />
+        <MoodChart key={refreshKey} refreshKey={refreshKey} />
       </div>
     </div>
   );

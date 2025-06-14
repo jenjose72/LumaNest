@@ -13,6 +13,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { Query } from 'appwrite'; // <-- Import Query
 
 Chart.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
 
@@ -89,13 +90,13 @@ function filterMoods(moods: Mood[], filter: string): Mood[] {
   });
 }
 
-export default function MoodChart() {
+export default function MoodChart({ refreshKey }: { refreshKey: number }) {
   const { user } = useAuth();
   const [moods, setMoods] = useState<Mood[]>([]);
   const [filter, setFilter] = useState<string>('all');
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch moods
+  // Fetch moods (only for current user, all moods up to 100 per call)
   const fetchMoods = async () => {
     if (!user) return;
     setLoading(true);
@@ -103,13 +104,23 @@ export default function MoodChart() {
       const res = await databases.listDocuments(
         process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
         process.env.NEXT_PUBLIC_APPWRITE_MOOD_COLLECTION_ID!,
-        []
+        [
+          Query.equal('userId', [user.$id]),
+          Query.limit(100), // fetch up to 100 moods at a time
+        ]
       );
-      const userMoods = res.documents.filter((doc: Mood) => doc.userId === user.$id);
-      userMoods.sort(
-        (a: Mood, b: Mood) =>
-          new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime()
-      );
+      const userMoods = res.documents
+        .sort(
+          (a, b) =>
+            new Date(a.timeStamp).getTime() - new Date(b.timeStamp).getTime()
+        )
+        .map((doc) => ({
+          userId: doc.userId,
+          timeStamp: doc.timeStamp,
+          valence: doc.valence,
+          arousal: doc.arousal,
+          emotionLabel: doc.emotionLabel,
+        })) as Mood[];
       setMoods(userMoods);
     } finally {
       setLoading(false);
@@ -118,19 +129,13 @@ export default function MoodChart() {
 
   useEffect(() => {
     fetchMoods();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, refreshKey]);
 
   const filteredMoods = filterMoods(moods, filter);
 
-  // Prepare chart data
-  const labels = filteredMoods.map((_, i) => i + 1); // Hide x-axis, use index
+  const labels = filteredMoods.map((_, i) => i + 1);
   const emotionIndices = filteredMoods.map((m) => orderedEmotions.indexOf(m.emotionLabel) + 1);
-
-  // Use a single color for the line
-  const lineColor = '#4f46e5'; // Indigo-600
-
-  // Node colors and subtle transition effect (Chart.js uses transitions by default)
+  const lineColor = '#4f46e5';
   const nodeColors = filteredMoods.map((m) => emotionColorMap[m.emotionLabel] || '#6366f1');
 
   const data = {
@@ -143,7 +148,7 @@ export default function MoodChart() {
         borderColor: lineColor,
         backgroundColor: 'rgba(79, 70, 229, 0.1)',
         tension: 0.35,
-        pointRadius: 8, // smaller nodes
+        pointRadius: 8,
         pointHoverRadius: 14,
         pointBackgroundColor: nodeColors,
         pointBorderColor: nodeColors,
@@ -163,13 +168,13 @@ export default function MoodChart() {
         title: {
           display: true,
           text: 'Emotion',
-          font: { size: 20, weight: 'bold' },
+          font: { size: 20, weight: 'bold' as const },
         },
         min: 1,
         max: orderedEmotions.length,
         ticks: {
           stepSize: 1,
-          font: { size: 18, weight: 'bold' },
+          font: { size: 18, weight: 'bold' as const },
           callback: function (value: number | string) {
             if (typeof value === 'number') {
               const emotion = orderedEmotions[value - 1];
@@ -186,8 +191,8 @@ export default function MoodChart() {
       tooltip: {
         enabled: true,
         backgroundColor: 'rgba(30,41,59,0.98)',
-        titleFont: { size: 20, weight: 'bold', family: 'inherit' },
-        bodyFont: { size: 18, family: 'inherit' },
+        titleFont: { size: 20, weight: 'bold' as const, family: 'inherit' },
+        bodyFont: { size: 18, weight: 'bold' as const, family: 'inherit' },
         padding: 18,
         borderRadius: 12,
         borderColor: lineColor,
@@ -219,7 +224,6 @@ export default function MoodChart() {
         backgroundColor: nodeColors,
         borderColor: nodeColors,
         borderWidth: 3,
-        // Chart.js animates color/size transitions by default
       },
       line: {
         borderWidth: 4,
@@ -229,7 +233,7 @@ export default function MoodChart() {
     },
     animation: {
       duration: 1000,
-      easing: 'easeOutCubic',
+      easing: 'easeOutCubic' as const,
     },
   };
 
@@ -262,7 +266,7 @@ export default function MoodChart() {
         <div className="text-indigo-300 text-center py-32 text-xl font-semibold">No mood data available for this period.</div>
       ) : (
         <div className="w-full h-full flex items-center justify-center">
-          <Line data={data} options={options} />
+          <Line data={data} options={options} redraw />
         </div>
       )}
       <div className="mt-8 text-indigo-500 italic text-center w-full text-lg">
