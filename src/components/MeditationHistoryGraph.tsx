@@ -27,7 +27,6 @@ interface MeditationSession {
 export default function MeditationHistoryGraph() {
   const { user } = useAuth();
   const [sessions, setSessions] = useState<MeditationSession[]>([]);
-  const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,14 +47,12 @@ export default function MeditationHistoryGraph() {
       .finally(() => setLoading(false));
   }, [user]);
 
-  const displayedSessions = showAll ? sessions : sessions.slice(-5);
-
   const data = {
-    labels: displayedSessions.map((s) => s.startTime),
+    labels: sessions.map((s) => s.startTime),
     datasets: [
       {
         label: 'Meditation Duration',
-        data: displayedSessions.map((s) => s.duration),
+        data: sessions.map((s) => s.duration),
         fill: false,
         borderColor: '#4f46e5',
         backgroundColor: '#a5b4fc',
@@ -74,12 +71,12 @@ export default function MeditationHistoryGraph() {
     maintainAspectRatio: false,
     scales: {
       x: {
-        display: false, // Hide x-axis
+        display: false,
         type: 'time' as const,
         time: { unit: 'minute' },
       },
       y: {
-        display: false, // Hide y-axis
+        display: false,
       },
     },
     plugins: {
@@ -97,12 +94,12 @@ export default function MeditationHistoryGraph() {
         callbacks: {
           title: function (context: any) {
             const idx = context[0].dataIndex;
-            const session = displayedSessions[idx];
+            const session = sessions[idx];
             return `🧘 ${new Date(session.startTime).toLocaleString()}`;
           },
           label: function (context: any) {
             const idx = context.dataIndex;
-            const session = displayedSessions[idx];
+            const session = sessions[idx];
             const min = Math.floor(session.duration / 60);
             const sec = session.duration % 60;
             return `Duration: ${min}m ${sec}s`;
@@ -141,14 +138,6 @@ export default function MeditationHistoryGraph() {
         <div className="w-full h-80 flex items-center justify-center">
           <Line data={data} options={options} />
         </div>
-      )}
-      {!showAll && sessions.length > 5 && (
-        <button
-          onClick={() => setShowAll(true)}
-          className="mt-6 px-6 py-2 rounded-full bg-indigo-600 text-white font-semibold shadow hover:bg-indigo-700 transition"
-        >
-          Show More
-        </button>
       )}
     </div>
   );

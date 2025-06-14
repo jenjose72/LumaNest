@@ -6,6 +6,7 @@ import { useAuth } from '@/context/auth-context';
 
 interface MeditationSession {
   $id: string;
+  userId: string;
   startTime: string;
   endTime: string;
   duration: number;
@@ -14,6 +15,7 @@ interface MeditationSession {
 export default function MeditationHistory() {
   const { user } = useAuth();
   const [sessions, setSessions] = useState<MeditationSession[]>([]);
+  const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,6 +36,8 @@ export default function MeditationHistory() {
       .finally(() => setLoading(false));
   }, [user]);
 
+  const displayedSessions = showAll ? sessions : sessions.slice(0, 5);
+
   return (
     <div className="w-full max-w-xl mt-8">
       <h3 className="text-lg font-semibold text-indigo-700 mb-4">Meditation History</h3>
@@ -43,7 +47,7 @@ export default function MeditationHistory() {
         <div className="text-indigo-300 text-center py-8">No meditation sessions yet.</div>
       ) : (
         <div className="grid gap-4">
-          {sessions.map((session) => (
+          {displayedSessions.map((session) => (
             <div
               key={session.$id}
               className="bg-white rounded-xl shadow p-4 flex flex-col sm:flex-row sm:items-center justify-between"
@@ -61,6 +65,25 @@ export default function MeditationHistory() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {sessions.length > 5 && (
+        <div className="flex justify-center mt-6">
+          {!showAll ? (
+            <button
+              onClick={() => setShowAll(true)}
+              className="px-6 py-2 rounded-full bg-indigo-600 text-white font-semibold shadow hover:bg-indigo-700 transition"
+            >
+              Show More
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowAll(false)}
+              className="px-6 py-2 rounded-full bg-gray-200 text-indigo-700 font-semibold shadow hover:bg-gray-300 transition"
+            >
+              Show Less
+            </button>
+          )}
         </div>
       )}
     </div>
