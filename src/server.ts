@@ -1,6 +1,16 @@
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '.env.local' });
+// Try to load from .env.local first, then fall back to .env
+try {
+  const localEnvResult = dotenv.config({ path: '.env.local' });
+  if (localEnvResult.error) {
+    console.log('No .env.local found, falling back to .env');
+    dotenv.config(); // This will load from .env by default
+  }
+} catch (error) {
+  console.log('Error loading .env.local, falling back to .env');
+  dotenv.config(); // This will load from .env by default
+}
 
 import { createServer } from 'http';
 import { parse } from 'url';
