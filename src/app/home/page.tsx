@@ -5,10 +5,12 @@ import { useAuth } from "@/context/auth-context";
 import { useRouter } from "next/navigation";
 import { features } from "@/lib/constants";
 import Navbar from "@/components/Navbar";
+import { useScrollDirection } from "@/components/hooks/useScrollDirection";
 
 export default function Home() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const scrollDirection = useScrollDirection();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,8 +28,16 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <main className="max-w-7xl mx-auto p-8">
+      {/* Navbar with hide/show on scroll */}
+      <div
+        className={`fixed top-0 left-0 w-full z-50 transition-transform duration-300 ${
+          scrollDirection === 'down' ? '-translate-y-full' : 'translate-y-0'
+        }`}
+      >
+        <Navbar />
+      </div>
+      {/* Padding so content is not hidden behind navbar */}
+      <main className="max-w-7xl mx-auto p-8 pt-24">
         <h1 className="text-4xl font-bold text-gray-800 mb-12 text-center">
           <span className="text-gray-700 mr-4">Welcome, {user?.name}</span>
         </h1>
