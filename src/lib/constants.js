@@ -11,7 +11,7 @@ export const features = [
   {
     title: 'Game Space',
     description: 'Pacman, Tetris, Tic Tac Toe, Hangman, Snake',
-    route: '/games',
+    route: '/game',
     color: 'green',
     icon: '🎮',
   },
