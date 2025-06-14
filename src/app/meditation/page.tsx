@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import MeditationTimer from '@/components/MeditationTimer';
 import MeditationHistory from '@/components/MeditationHistory';
+import MeditationHistoryGraph from '@/components/MeditationHistoryGraph';
 
 export default function MeditationPage() {
   const { user, loading } = useAuth();
@@ -29,6 +30,7 @@ export default function MeditationPage() {
     <div className="min-h-screen flex flex-col items-center bg-gray-50 py-12 px-4">
       <MeditationTimer onSessionSaved={() => setRefreshKey((k) => k + 1)} />
       <MeditationHistory key={refreshKey} />
+      <MeditationHistoryGraph />
     </div>
   );
 }
