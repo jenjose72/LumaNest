@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Client, Account, ID } from "appwrite";
+import { Client, Account } from "appwrite";
 
 // Initialize Appwrite Client
 const client = new Client();
@@ -18,7 +18,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [isChecking, setIsChecking] = useState(true);
 
   // Check if user is already logged in
@@ -41,7 +40,6 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     try {
@@ -49,10 +47,6 @@ export default function LoginPage() {
       router.push('/home');
     } catch (error) {
       console.error("Login error:", error);
-      setError(
-        error.message || 
-        "Failed to login. Please check your credentials and try again."
-      );
       setIsLoading(false);
     }
   };
@@ -73,12 +67,6 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-800">Welcome Back</h1>
           <p className="text-gray-600 mt-2">Sign in to continue to your account</p>
         </div>
-
-        {error && (
-          <div className="mb-6 p-3 bg-red-100 text-red-700 rounded-md">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleLogin}>
           <div className="mb-6">

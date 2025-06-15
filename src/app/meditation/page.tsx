@@ -73,7 +73,6 @@ export default function MeditationPage() {
 	const [selectedMeditation, setSelectedMeditation] = useState<string | null>(
 		null
 	);
-	const [showSteps, setShowSteps] = useState(false);
 	const [isCustomTimer, setIsCustomTimer] = useState(false);
 	const [customDuration, setCustomDuration] = useState(10);
 
@@ -188,13 +187,11 @@ export default function MeditationPage() {
 	const handleMeditationSelect = (id: string) => {
 		setSelectedMeditation(id);
 		setIsCustomTimer(false);
-		setShowSteps(true);
 	};
 
 	const handleCustomTimerSelect = () => {
 		setSelectedMeditation(null);
 		setIsCustomTimer(true);
-		setShowSteps(false);
 	};
 
 	const getCurrentMeditation = () => {
@@ -203,7 +200,7 @@ export default function MeditationPage() {
 
 	const startMeditation = () => {
 		// Set up the timer based on selected meditation or custom duration
-		let duration = isCustomTimer
+		const duration = isCustomTimer
 			? customDuration * 60 // convert minutes to seconds
 			: (getCurrentMeditation()?.duration || 5) * 60; // default to 5 minutes
 
@@ -219,9 +216,6 @@ export default function MeditationPage() {
 				.play()
 				.catch((e) => console.error('Could not play audio:', e));
 		}
-
-		// Hide steps when timer starts
-		setShowSteps(false);
 	};
 
 	const pauseTimer = () => {

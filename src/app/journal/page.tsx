@@ -290,7 +290,7 @@ export default function JournalPage() {
         setMoodSummary(data.summary || "Unable to generate mood summary.");
       } catch (error) {
         // Generate a fallback summary
-        let avgMood = journalsForSummary.reduce((sum, j) => sum + j.mood, 0) / journalsForSummary.length;
+        const avgMood = journalsForSummary.reduce((sum, j) => sum + j.mood, 0) / journalsForSummary.length;
         
         if (avgMood > 3.5) {
           setMoodSummary("Your mood has been generally positive this week! Keep up the good habits that are supporting your well-being.");

@@ -45,7 +45,7 @@ export default function GameBoard({
                 let isFilled = cell !== EMPTY_CELL;
                 let color = isFilled ? cell.color : '';
                 let border = isFilled ? cell.border : '';
-                let isRowAnimating = animatingRows.includes(rowIndex);
+                const isRowAnimating = animatingRows.includes(rowIndex);
                 
                 // Check if current piece occupies this cell
                 if (currentPiece && !gameOver && !isPaused && !isAnimating) {

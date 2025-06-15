@@ -74,8 +74,8 @@ export default function Home() {
           MOODS_COLLECTION_ID,
           [
             Query.equal('userId', user?.$id || ''),
-            Query.greaterThanEqual('createdAt', todayStart),
-            Query.lessThanEqual('createdAt', todayEnd)
+            Query.greaterThanEqual('$createdAt', todayStart),
+            Query.lessThanEqual('$createdAt', todayEnd)
           ]
         );
         

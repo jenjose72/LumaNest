@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { Client, Databases, Query } from "node-appwrite";
-import { cookies } from "next/headers";
 
 // Initialize the Appwrite client with server-side API key for database operations
 const server = new Client()
@@ -15,7 +14,7 @@ export async function GET(request) {
     // Get userId from the request query parameters
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
-    
+
     // Validate userId
     if (!userId) {
       return NextResponse.json(

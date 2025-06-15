@@ -74,7 +74,7 @@ export function useTetris() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [showScorePopup, setShowScorePopup] = useState(false);
   const [scorePopupValue, setScorePopupValue] = useState(0);
-  
+
   const animationTimeoutRef = useRef(null);
   const scorePopupTimeoutRef = useRef(null);
 
@@ -96,27 +96,27 @@ export function useTetris() {
     setLines(0);
     setAnimatingRows([]);
     setIsAnimating(false);
-    
+
     if (animationTimeoutRef.current) {
       clearTimeout(animationTimeoutRef.current);
     }
-    
+
     if (scorePopupTimeoutRef.current) {
       clearTimeout(scorePopupTimeoutRef.current);
     }
-    
+
     // Generate both current and next piece
     const firstPiece = getRandomTetromino();
     const secondPiece = getRandomTetromino();
-    
+
     setCurrentPiece(firstPiece);
     setNextPiece(secondPiece);
-    
+
     const startPos = {
       x: Math.floor(BOARD_WIDTH / 2) - Math.floor(firstPiece.shape[0].length / 2),
       y: 0,
     };
-    
+
     setPosition(startPos);
     setGameStarted(true);
     setIsPaused(false);
@@ -125,13 +125,13 @@ export function useTetris() {
   // Check for collisions
   const hasCollision = useCallback((shape, pos) => {
     if (!shape) return true;
-    
+
     for (let y = 0; y < shape.length; y++) {
       for (let x = 0; x < shape[y].length; x++) {
         if (shape[y][x] !== 0) {
           const boardX = pos.x + x;
           const boardY = pos.y + y;
-          
+
           // Check boundaries
           if (
             boardX < 0 ||
@@ -154,22 +154,22 @@ export function useTetris() {
     const newCurrentPiece = nextPiece || getRandomTetromino();
     // Generate a new next piece
     const newNextPiece = getRandomTetromino();
-    
+
     const startPos = {
       x: Math.floor(BOARD_WIDTH / 2) - Math.floor(newCurrentPiece.shape[0].length / 2),
       y: 0,
     };
-    
+
     setCurrentPiece(newCurrentPiece);
     setNextPiece(newNextPiece);
     setPosition(startPos);
-    
+
     // Check for game over
     if (hasCollision(newCurrentPiece.shape, startPos)) {
       setGameOver(true);
     }
   }, [nextPiece, getRandomTetromino, hasCollision]);
-  
+
   // Rotate a tetromino piece
   const rotatePiece = useCallback((piece) => {
     const rotated = [];
@@ -187,7 +187,7 @@ export function useTetris() {
   const tryMove = useCallback((dx, dy, rotate = false) => {
     if (!currentPiece || gameOver || isPaused || isAnimating) return false;
 
-    let newPos = { x: position.x + dx, y: position.y + dy };
+    const newPos = { x: position.x + dx, y: position.y + dy };
     let newShape = currentPiece.shape;
 
     if (rotate) {
@@ -207,9 +207,9 @@ export function useTetris() {
   // Lock the current piece to the board
   const lockPiece = useCallback(() => {
     if (!currentPiece || isAnimating) return;
-    
+
     const newBoard = [...board];
-    
+
     for (let y = 0; y < currentPiece.shape.length; y++) {
       for (let x = 0; x < currentPiece.shape[y].length; x++) {
         if (currentPiece.shape[y][x] !== 0) {
@@ -228,17 +228,17 @@ export function useTetris() {
         }
       }
     }
-    
+
     // Check for completed lines
-    let completedRows = [];
+    const completedRows = [];
     for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
       if (newBoard[y].every(cell => cell !== EMPTY_CELL)) {
         completedRows.push(y);
       }
     }
-    
+
     setBoard(newBoard);
-    
+
     // If there are completed lines, start the animation
     if (completedRows.length > 0) {
       // Play sound effect for line clear
@@ -247,10 +247,10 @@ export function useTetris() {
         clearSound.currentTime = 0;
         clearSound.play().catch(e => console.log('Error playing sound:', e));
       }
-      
+
       setAnimatingRows(completedRows);
       setIsAnimating(true);
-      
+
       // After animation, remove lines and spawn new piece
       animationTimeoutRef.current = setTimeout(() => {
         clearLines(completedRows, newBoard);
@@ -258,19 +258,19 @@ export function useTetris() {
     } else {
       spawnNewPiece();
     }
-  }, [board, currentPiece, position, isAnimating, spawnNewPiece]);
+  }, [board, currentPiece, position, isAnimating, spawnNewPiece, clearLines]);
 
   // Clear completed lines with animation
   const clearLines = useCallback((completedRows, currentBoard) => {
     const newBoard = [...currentBoard];
-    
+
     // Remove completed rows
     for (let i = 0; i < completedRows.length; i++) {
       const rowIndex = completedRows[i] - i; // Adjust index after each removal
       newBoard.splice(rowIndex, 1);
       newBoard.unshift(Array(BOARD_WIDTH).fill(EMPTY_CELL));
     }
-    
+
     // Update score
     const linesCleared = completedRows.length;
     if (linesCleared > 0) {
@@ -279,20 +279,20 @@ export function useTetris() {
       const newScore = score + pointsEarned;
       const newLines = lines + linesCleared;
       const newLevel = Math.floor(newLines / 10) + 1;
-      
+
       setScore(newScore);
       setLines(newLines);
       setLevel(newLevel);
-      
+
       // Show score popup
       setScorePopupValue(pointsEarned);
       setShowScorePopup(true);
-      
+
       scorePopupTimeoutRef.current = setTimeout(() => {
         setShowScorePopup(false);
       }, 1500);
     }
-    
+
     setBoard(newBoard);
     setAnimatingRows([]);
     setIsAnimating(false);
@@ -302,7 +302,7 @@ export function useTetris() {
   // Drop the current piece one row
   const dropPiece = useCallback(() => {
     if (isAnimating) return false;
-    
+
     if (!tryMove(0, 1)) {
       lockPiece();
       return false;
@@ -312,82 +312,80 @@ export function useTetris() {
 
   // Hard drop the piece
   const hardDrop = useCallback(() => {
-  if (!currentPiece || gameOver || isPaused) return;
+    if (!currentPiece || gameOver || isPaused) return;
 
-  let dropDistance = 0;
-  let newY = position.y;
+    let newY = position.y;
 
-  // Calculate how far down we can go
-  while (
-    !hasCollision(currentPiece.shape, { x: position.x, y: newY + 1 })
-  ) {
-    newY++;
-    dropDistance++;
-  }
+    // Calculate how far down we can go
+    while (
+      !hasCollision(currentPiece.shape, { x: position.x, y: newY + 1 })
+    ) {
+      newY++;
+    }
 
-  // Create a new board with the piece placed at the final position
-  const newBoard = [...board];
-  for (let y = 0; y < currentPiece.shape.length; y++) {
-    for (let x = 0; x < currentPiece.shape[y].length; x++) {
-      if (currentPiece.shape[y][x] !== 0) {
-        const boardY = newY + y;
-        const boardX = position.x + x;
-        if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
-          newBoard[boardY][boardX] = currentPiece.color;
+    // Create a new board with the piece placed at the final position
+    const newBoard = [...board];
+    for (let y = 0; y < currentPiece.shape.length; y++) {
+      for (let x = 0; x < currentPiece.shape[y].length; x++) {
+        if (currentPiece.shape[y][x] !== 0) {
+          const boardY = newY + y;
+          const boardX = position.x + x;
+          if (boardY >= 0 && boardY < BOARD_HEIGHT && boardX >= 0 && boardX < BOARD_WIDTH) {
+            newBoard[boardY][boardX] = currentPiece.color;
+          }
         }
       }
     }
-  }
 
-  // Check for line clears and update state
-  let linesCleared = 0;
-  for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
-    if (newBoard[y].every(cell => cell !== EMPTY_CELL)) {
-      newBoard.splice(y, 1);
-      newBoard.unshift(Array(BOARD_WIDTH).fill(EMPTY_CELL));
-      linesCleared++;
-      y++; // recheck same line
+    // Check for line clears and update state
+    let linesCleared = 0;
+    for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
+      if (newBoard[y].every(cell => cell !== EMPTY_CELL)) {
+        newBoard.splice(y, 1);
+        newBoard.unshift(Array(BOARD_WIDTH).fill(EMPTY_CELL));
+        linesCleared++;
+        y++; // recheck same line
+      }
     }
-  }
 
-  // Update score, lines, level
-  if (linesCleared > 0) {
-    const linePoints = [0, 40, 100, 300, 1200];
-    const newScore = score + linePoints[linesCleared] * level;
-    const newLines = lines + linesCleared;
-    const newLevel = Math.floor(newLines / 10) + 1;
+    // Update score, lines, level
+    if (linesCleared > 0) {
+      const linePoints = [0, 40, 100, 300, 1200];
+      const newScore = score + linePoints[linesCleared] * level;
+      const newLines = lines + linesCleared;
+      const newLevel = Math.floor(newLines / 10) + 1;
 
-    setScore(newScore);
-    setLines(newLines);
-    setLevel(newLevel);
-  }
+      setScore(newScore);
+      setLines(newLines);
+      setLevel(newLevel);
+    }
 
-  // Apply new board and reset piece
-  setBoard(newBoard);
-  setCurrentPiece(null);
-  setPosition({ x: 0, y: 0 });
-  spawnNewPiece();
-}, [board, currentPiece, gameOver, isPaused, hasCollision, position, score, lines, level, spawnNewPiece]);
+    // Apply new board and reset piece
+    setBoard(newBoard);
+    setCurrentPiece(null);
+    setPosition({ x: 0, y: 0 });
+    spawnNewPiece();
+  }, [board, currentPiece, gameOver, isPaused, hasCollision, position, score, lines, level, spawnNewPiece]);
 
   // Handle keyboard controls
   const handleKeyDown = useCallback((e) => {
     if (!gameStarted || gameOver) return;
-    
+
     // Prevent default behavior for game controls to avoid scrolling
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' ', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'].includes(e.key)) {
       e.preventDefault();
     }
-    
+
     if (e.key === 'p' || e.key === 'P') {
       setIsPaused(prev => !prev);
       return;
     }
-    
+
     if (isPaused || isAnimating) return;
-    
+
     // Play a soft tick sound for moves
     const moveSound = document.getElementById('move-sound');
-    
+
     switch (e.key) {
       case 'ArrowLeft':
       case 'a':
@@ -395,7 +393,7 @@ export function useTetris() {
         if (tryMove(-1, 0) && moveSound) {
           moveSound.currentTime = 0;
           moveSound.volume = 0.3;
-          moveSound.play().catch(e => {});
+          moveSound.play().catch(e => { });
         }
         break;
       case 'ArrowRight':
@@ -404,7 +402,7 @@ export function useTetris() {
         if (tryMove(1, 0) && moveSound) {
           moveSound.currentTime = 0;
           moveSound.volume = 0.3;
-          moveSound.play().catch(e => {});
+          moveSound.play().catch(e => { });
         }
         break;
       case 'ArrowDown':
@@ -418,7 +416,7 @@ export function useTetris() {
         if (tryMove(0, 0, true) && moveSound) {
           moveSound.currentTime = 0;
           moveSound.volume = 0.5;
-          moveSound.play().catch(e => {});
+          moveSound.play().catch(e => { });
         }
         break;
       case ' ':
@@ -432,34 +430,34 @@ export function useTetris() {
   // Get ghost piece position (preview of where piece will land)
   const getGhostPosition = useCallback(() => {
     if (!currentPiece || gameOver || isPaused) return null;
-    
+
     let ghostY = position.y;
-    
+
     // Find the lowest possible position
     while (!hasCollision(
-      currentPiece.shape, 
+      currentPiece.shape,
       { x: position.x, y: ghostY + 1 }
     )) {
       ghostY++;
     }
-    
+
     return { x: position.x, y: ghostY };
   }, [currentPiece, position, gameOver, isPaused, hasCollision]);
-  
+
   // Game loop - handle automatic piece falling
   useEffect(() => {
     if (!gameStarted || gameOver || isPaused || isAnimating) return;
-    
+
     const dropSpeed = 1000 / level;
     const intervalId = setInterval(() => {
       dropPiece();
     }, dropSpeed);
-    
+
     return () => {
       clearInterval(intervalId);
     };
   }, [gameStarted, gameOver, isPaused, isAnimating, level, dropPiece]);
-  
+
   // Setup keyboard event listeners
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -483,23 +481,23 @@ export function useTetris() {
   // Mobile control handler
   const handleTouchControl = (action) => {
     if (!gameStarted || gameOver || isPaused || isAnimating) return;
-    
+
     // Play a soft tick sound for moves
     const moveSound = document.getElementById('move-sound');
-    
+
     switch (action) {
       case 'left':
         if (tryMove(-1, 0) && moveSound) {
           moveSound.currentTime = 0;
           moveSound.volume = 0.3;
-          moveSound.play().catch(e => {});
+          moveSound.play().catch(e => { });
         }
         break;
       case 'right':
         if (tryMove(1, 0) && moveSound) {
           moveSound.currentTime = 0;
           moveSound.volume = 0.3;
-          moveSound.play().catch(e => {});
+          moveSound.play().catch(e => { });
         }
         break;
       case 'down':
@@ -509,7 +507,7 @@ export function useTetris() {
         if (tryMove(0, 0, true) && moveSound) {
           moveSound.currentTime = 0;
           moveSound.volume = 0.5;
-          moveSound.play().catch(e => {});
+          moveSound.play().catch(e => { });
         }
         break;
       case 'drop':

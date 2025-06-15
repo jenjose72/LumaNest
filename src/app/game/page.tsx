@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Client, Account } from "appwrite";
+import Image from "next/image";
 
 // Initialize Appwrite Client
 const client = new Client();
@@ -78,7 +78,6 @@ const games = [
 
 export default function GamesPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [filter, setFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -91,8 +90,6 @@ export default function GamesPage() {
         setUser(currentUser);
       } catch (error) {
         console.log("User not logged in");
-      } finally {
-        setLoading(false);
       }
     };
     
@@ -189,9 +186,11 @@ export default function GamesPage() {
             >
               <div className={`h-48 bg-gradient-to-r ${game.color} flex items-center justify-center relative overflow-hidden`}>
                 {game.image ? (
-                  <img 
+                  <Image 
                     src={game.image} 
                     alt={game.name} 
+                    width={500}
+                    height={500}
                     className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity"
                   />
                 ) : (

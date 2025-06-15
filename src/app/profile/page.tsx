@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Client, Account, Databases, ID, Query } from "appwrite";
+import { Client, Account, Databases, Query } from "appwrite";
+import Image from "next/image";
 
 // Initialize Appwrite Client
 const client = new Client();
@@ -29,7 +30,7 @@ export default function ProfilePage() {
         const currentUser = await account.get();
         
         // Create profile object from Appwrite Auth user data
-        let userProfile = {
+        const userProfile = {
           id: currentUser.$id,
           name: currentUser.name,
           email: currentUser.email,
@@ -179,10 +180,12 @@ export default function ProfilePage() {
               {/* Profile Header */}
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 text-center">
                 <div className="relative mb-4 inline-block">
-                  <img
+                  <Image
                     src={profile.avatar}
                     alt="Avatar"
                     className="w-24 h-24 rounded-full border-4 border-white mx-auto object-cover"
+                    width={96}
+                    height={96}
                   />
                   {!isEditing && (
                     <button 

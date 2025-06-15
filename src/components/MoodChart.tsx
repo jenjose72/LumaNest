@@ -129,7 +129,7 @@ export default function MoodChart({ refreshKey }: { refreshKey: number }) {
 
   useEffect(() => {
     fetchMoods();
-  }, [user, refreshKey]);
+  }, [user, refreshKey, fetchMoods]);
 
   const filteredMoods = filterMoods(moods, filter);
 
