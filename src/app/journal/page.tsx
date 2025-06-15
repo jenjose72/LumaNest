@@ -48,7 +48,7 @@ export default function JournalPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: entry, mood }),
     });
-    const data = await res.json();
+    const data = res;
     setMessages([
       {
         role: "system",
