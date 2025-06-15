@@ -38,7 +38,7 @@ async function startServer() {
 
     // Create Socket.IO server
     const socketServer = createServer();
-    const io = initSocketServer(socketServer);
+    // const io = initSocketServer(socketServer);
 
     socketServer.on('error', (err) => {
       console.error('Socket server error:', err);
