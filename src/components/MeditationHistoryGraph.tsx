@@ -85,7 +85,7 @@ export default function MeditationHistoryGraph() {
               tick={{ fontSize: 13, fill: '#4f46e5' }}
               interval="preserveStartEnd"
             >
-              <Label value="Date" offset={-5} position="insideBottom" fontSize={16} fontWeight="bold" fill="#4f46e5" />
+              <Label value="Date" offset={-0} position="insideBottom" fontSize={16} fontWeight="bold" fill="#4f46e5" />
             </XAxis>
             <YAxis
               tick={{ fontSize: 13, fill: '#4f46e5' }}
@@ -138,9 +138,10 @@ export default function MeditationHistoryGraph() {
               }}
             />
             {/* Zoom/brush control */}
+            
             <Brush
               dataKey="date"
-              height={24}
+              height={20}
               stroke="#4f46e5"
               travellerWidth={12}
               fill="#eef2ff"
