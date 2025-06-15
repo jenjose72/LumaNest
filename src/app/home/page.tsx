@@ -85,8 +85,7 @@ export default function Home() {
           MEDITATIONS_COLLECTION_ID,
           [
             Query.equal('userId', user?.$id || ''),
-            Query.greaterThanEqual('createdAt', todayStart),
-            Query.lessThanEqual('createdAt', todayEnd)
+
           ]
         );
         
@@ -96,8 +95,7 @@ export default function Home() {
           JOURNALS_COLLECTION_ID,
           [
             Query.equal('userId', user?.$id || ''),
-            Query.greaterThanEqual('createdAt', todayStart),
-            Query.lessThanEqual('createdAt', todayEnd)
+  
           ]
         );
         
