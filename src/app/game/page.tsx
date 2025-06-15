@@ -18,9 +18,9 @@ const games = [
     id: "tetris",
     name: "Tetris",
     description: "The classic block-stacking puzzle game. Arrange falling pieces to create complete lines.",
-    image: "/images/games/tetris.png", // Add these images to your public folder
+    image: "/images/game/tetris.png", // Add these images to your public folder
     color: "from-indigo-500 to-purple-600",
-    path: "/games/tetris",
+    path: "/game/tetris",
     tags: ["Puzzle", "Classic"],
     difficulty: "Medium"
   },
@@ -28,9 +28,9 @@ const games = [
     id: "snake",
     name: "Snake",
     description: "Control a growing snake to collect food without hitting walls or yourself.",
-    image: "/images/games/snake.png",
+    image: "/images/game/snake.png",
     color: "from-green-500 to-emerald-700",
-    path: "/games/snake",
+    path: "/game/snake",
     tags: ["Arcade", "Classic"],
     difficulty: "Easy"
   },
@@ -38,9 +38,9 @@ const games = [
     id: "2048",
     name: "2048",
     description: "Merge tiles with the same numbers to reach 2048 and beyond in this addictive puzzle.",
-    image: "/images/games/2048.png",
+    image: "/images/game/2048.png",
     color: "from-yellow-400 to-orange-600",
-    path: "/games/2048",
+    path: "/game/2048",
     tags: ["Puzzle", "Strategy"],
     difficulty: "Medium"
   },
@@ -48,9 +48,9 @@ const games = [
     id: "memory",
     name: "Memory Match",
     description: "Test your memory by matching pairs of cards in this concentration game.",
-    image: "/images/games/memory.png",
+    image: "/images/game/memory.png",
     color: "from-pink-500 to-rose-600",
-    path: "/games/memory",
+    path: "/game/memory",
     tags: ["Memory", "Casual"],
     difficulty: "Easy"
   },
@@ -58,9 +58,9 @@ const games = [
     id: "sudoku",
     name: "Sudoku",
     description: "Fill the 9×9 grid with numbers so each column, row, and 3×3 box contains all digits from 1-9.",
-    image: "/images/games/sudoku.png",
+    image: "/images/game/sudoku.png",
     color: "from-blue-500 to-cyan-600",
-    path: "/games/sudoku",
+    path: "/game/sudoku",
     tags: ["Puzzle", "Numbers"],
     difficulty: "Hard"
   },
@@ -68,9 +68,9 @@ const games = [
     id: "wordle",
     name: "Word Puzzle",
     description: "Guess the hidden word in six attempts with color-coded feedback on your guesses.",
-    image: "/images/games/wordle.png",
+    image: "/images/game/wordle.png",
     color: "from-teal-500 to-green-600",
-    path: "/games/wordle",
+    path: "/game/wordle",
     tags: ["Word", "Puzzle"],
     difficulty: "Medium"
   }
