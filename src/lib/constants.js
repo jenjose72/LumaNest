@@ -53,7 +53,7 @@ export const features = [
   {
     title: 'AI Assistant',
     description: 'Chat or talk with AI support',
-    route: '/assistant',
+    route: '/voice',
     color: 'red',
     icon: '🤖',
   },

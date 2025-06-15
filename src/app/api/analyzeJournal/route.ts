@@ -12,26 +12,36 @@ const openai = new OpenAI({
 const client = new Client()
   .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!) // e.g. 'https://cloud.appwrite.io/v1'
   .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!) // Your project ID
-  .setKey(process.env.APPWRITE_API_KEY!); // Your API key (set this in .env.local as APPWRITE_API_KEY)
+  .setKey(process.env.APPWRITE_API_KEY!); // Your API key
 
 const databases = new Databases(client);
 
 export async function POST(req: Request) {
   const body = await req.json();
 
-  // If it's a journal entry, save it
-  if (body.text && body.mood !== undefined) {
-    const createdAt = new Date().toISOString();
-    await databases.createDocument(
-      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!, // Your database ID
-      process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID!, // Your collection ID (add this to .env.local)
-      ID.unique(),
-      {
-        text: body.text,
-        createdAt,
-        mood: body.mood,
-      }
-    );
+  // If database IDs are available and it's a journal entry, save it
+  if (
+    body.text &&
+    body.mood !== undefined &&
+    process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID &&
+    process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID
+  ) {
+    try {
+      const createdAt = new Date().toISOString();
+      await databases.createDocument(
+        process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID,
+        process.env.NEXT_PUBLIC_APPWRITE_COLLECTION_ID,
+        ID.unique(),
+        {
+          text: body.text,
+          createdAt,
+          mood: body.mood,
+        }
+      );
+    } catch (error) {
+      console.error("Error saving journal entry to database:", error);
+      // Continue without throwing - we still want to get AI response
+    }
   }
 
   // Use messages for chat, or build messages from text if not provided
@@ -45,12 +55,9 @@ If the entry is happy, celebrate it warmly.
 Avoid sounding clinical or analytical.
 Keep the response short, warm, and in second person, like a caring friend talking directly to them.
 Use simple words, short paragraphs, and friendly tone. Emojis are welcome if they feel natural.
- MAKE SURE TO MAKE THE TEXT MORE SIMPLE AND NOT VERY DESCRIPTIVE. LIKE A CARING MOTHER IT SHOULD ASK
- AI reads the text and:
-Detects emotion or sentiment.
-Offers supportive messages, motivational quotes, or simple CBT (Cognitive Behavioral Therapy) prompts.
-Might even tag the mood (e.g. anxious, happy, sad) more accurately than manual input.
-Suggests self-care tips like: “Try a short breathing exercise” if negative mood is detected.
+Detect emotion or sentiment.
+Offer supportive messages, motivational quotes, or simple CBT prompts.
+Suggest self-care tips like: "Try a short breathing exercise" if negative mood is detected.
 `,
     },
     {
