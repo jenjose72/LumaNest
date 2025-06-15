@@ -89,6 +89,7 @@ export default function JournalPage() {
 
   // Submit journal and start conversation
   const handleJournalSubmit = async () => {
+
     if (!entry.trim()) return;
     
     setIsLoading(true);
@@ -173,6 +174,7 @@ export default function JournalPage() {
     } finally {
       setIsLoading(false);
     }
+
   };
 
   // Combine database journals with session journals for the chart
