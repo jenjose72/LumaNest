@@ -29,7 +29,7 @@ export default function Navbar({ className = "" }: { className?: string }) {
         <div className="flex items-center space-x-4">
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
-            <Link href="/mood-tracker" className="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">
+            <Link href="/moodTracker" className="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">
               Mood Tracker
             </Link>
             <Link href="/meditation" className="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900">

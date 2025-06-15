@@ -319,7 +319,7 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {/* Mood Tracker */}
             <div 
-              onClick={() => router.push("/mood-tracker")} 
+              onClick={() => router.push("/moodTracker")} 
               className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer border border-slate-200 overflow-hidden group"
             >
               <div className="h-3 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
