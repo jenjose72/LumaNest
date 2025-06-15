@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Brush, Label } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Brush, Label, Cell } from 'recharts';
 import { databases } from '@/lib/appwrite';
 import { useAuth } from '@/context/auth-context';
 import { Query } from 'appwrite';
@@ -62,10 +62,11 @@ export default function MeditationHistoryGraph() {
 
   // Prepare data for Recharts
   const chartData = sessions.map(s => ({
-    ...s,
+    id: s.$id,
     date: new Date(s.startTime).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }),
+    duration: s.duration,
+    startTime: s.startTime,
     color: getBarColor(s.duration, maxDuration),
-    tooltip: `${formatDuration(s.duration)} on ${new Date(s.startTime).toLocaleString()}`
   }));
 
   return (
@@ -109,10 +110,10 @@ export default function MeditationHistoryGraph() {
                 fontWeight: 600,
                 fontSize: 15,
               }}
-              formatter={(_, __, props: any) =>
+              formatter={(value: any, name: any, props: any) =>
                 [formatDuration(props.payload.duration), 'Duration']
               }
-              labelFormatter={(_, props: any) =>
+              labelFormatter={(label: any, props: any) =>
                 `🧘 ${props && props[0] && props[0].payload
                   ? new Date(props[0].payload.startTime).toLocaleString()
                   : ''}`
@@ -123,22 +124,13 @@ export default function MeditationHistoryGraph() {
               radius={[6, 6, 0, 0]}
               isAnimationActive={true}
               animationDuration={900}
-              fill="#4f46e5"
               stroke="#fff"
               strokeWidth={1}
-              // Per-bar coloring
-              {...{
-                shape: (props: any) => (
-                  <rect
-                    {...props}
-                    fill={props.payload.color}
-                    rx={6}
-                  />
-                )
-              }}
-            />
-            {/* Zoom/brush control */}
-            
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Bar>
             <Brush
               dataKey="date"
               height={20}

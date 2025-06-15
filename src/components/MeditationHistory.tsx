@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { databases } from '@/lib/appwrite';
 import { useAuth } from '@/context/auth-context';
+import { Query } from 'appwrite';
 
 interface MeditationSession {
   $id: string;
@@ -25,12 +26,21 @@ export default function MeditationHistory() {
       .listDocuments(
         process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
         process.env.NEXT_PUBLIC_APPWRITE_MEDITATION_COLLECTION_ID!,
-        []
+        [
+          Query.equal('userId', [user.$id]),
+          Query.limit(100),
+        ]
       )
       .then((res) => {
-        const userSessions = res.documents
-          .filter((doc: MeditationSession) => doc.userId === user.$id)
-          .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
+        const userSessions: MeditationSession[] = res.documents
+          .sort((a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime())
+          .map((doc) => ({
+            $id: doc.$id,
+            userId: doc.userId,
+            startTime: doc.startTime,
+            endTime: doc.endTime,
+            duration: doc.duration,
+          }));
         setSessions(userSessions);
       })
       .finally(() => setLoading(false));
